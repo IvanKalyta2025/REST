@@ -14,11 +14,24 @@ namespace REST.Controllers
     {
         private static readonly List<TaskItem> tasks = new();
 
+        private static int nextId = 1;
 
         [HttpGet]
         public IActionResult GetTasks()
         {
             return Ok(tasks);
         }
+        [HttpPost]
+        public IActionResult CreateTask([FromBody] TaskItem newTask)
+        {
+            if (string.IsNullOrWhiteSpace(newTask.Title))
+                return BadRequest("Title is required");
+
+            newTask.Id = nextId++;
+            tasks.Add(newTask);
+
+            return CreatedAtAction(nameof(GetTasks), new { id = newTask.Id }, newTask);
+        }
+
     }
 }
